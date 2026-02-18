@@ -1,0 +1,34 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__laravel-boost__application-info",
+      "mcp__laravel-boost__database-schema",
+      "mcp__laravel-boost__list-routes",
+      "Bash(npm run build:*)",
+      "Bash(php artisan make:test:*)",
+      "Bash(vendor/bin/pint:*)",
+      "Bash(php artisan test:*)",
+      "Bash(xargs:*)",
+      "mcp__laravel-boost__search-docs",
+      "Bash(php artisan make:model:*)",
+      "Bash(php artisan migrate:*)",
+      "Bash(php artisan make:controller:*)",
+      "Bash(npx shadcn-vue@latest add:*)",
+      "Bash(php artisan route:list:*)",
+      "mcp__laravel-boost__tinker",
+      "Bash(npm run lint:*)",
+      "Bash(npm run format:*)",
+      "Bash(npm install:*)",
+      "mcp__laravel-boost__database-query",
+      "mcp__laravel-boost__browser-logs",
+      "Bash(npx eslint:*)",
+      "Bash(npx prettier:*)",
+      "Bash(php artisan make:migration:*)",
+      "Bash(git -C /Users/willardmacay/Devs/ai/trvelapp status)",
+      "Bash(gh auth status:*)",
+      "Bash(git init:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
