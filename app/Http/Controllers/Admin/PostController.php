@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePostRequest;
 use App\Http\Requests\Admin\UpdatePostRequest;
 use App\Models\Post;
+use App\Services\ImageOptimizer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -17,6 +18,8 @@ use Inertia\Response;
 
 class PostController extends Controller
 {
+    public function __construct(private readonly ImageOptimizer $imageOptimizer) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -168,7 +171,7 @@ class PostController extends Controller
 
         foreach ($files as $index => $file) {
             $post->photos()->create([
-                'path' => $file->store('posts', 'public'),
+                'path' => $this->imageOptimizer->store($file, 'posts'),
                 'is_cover' => $index === $coverIndex,
                 'order' => $index,
             ]);
@@ -212,7 +215,7 @@ class PostController extends Controller
             }
 
             $post->photos()->create([
-                'path' => $file->store('posts', 'public'),
+                'path' => $this->imageOptimizer->store($file, 'posts'),
                 'is_cover' => $isCover,
                 'order' => $existingCount + $index,
             ]);
