@@ -17,9 +17,11 @@ const props = withDefaults(
     defineProps<{
         posts: MapPost[];
         height?: string;
+        zoom?: number;
     }>(),
     {
         height: '400px',
+        zoom: undefined,
     },
 );
 
@@ -47,7 +49,8 @@ async function initMap() {
         .tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution:
                 '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-            maxZoom: 19,
+            maxNativeZoom: 19,
+            maxZoom: 20,
         })
         .addTo(mapInstance);
 
@@ -78,7 +81,12 @@ function renderMarkers() {
         markersLayer.addLayer(marker);
     });
 
-    if (markersLayer.getLayers().length > 0) {
+    const layers = markersLayer.getLayers();
+
+    if (layers.length === 1 && props.zoom !== undefined) {
+        const { lat, lng } = layers[0].getLatLng();
+        mapInstance.setView([lat, lng], props.zoom);
+    } else if (layers.length > 0) {
         mapInstance.fitBounds(markersLayer.getBounds().pad(0.1));
     }
 }

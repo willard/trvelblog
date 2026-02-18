@@ -87,7 +87,7 @@ defineProps<{
                     <Separator class="my-6" />
 
                     <div class="overflow-hidden rounded-lg">
-                        <LeafletMap :posts="[post]" height="250px" />
+                        <LeafletMap :posts="[post]" height="250px" :zoom="5" />
                     </div>
                 </CardContent>
             </Card>
