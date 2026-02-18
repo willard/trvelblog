@@ -127,6 +127,65 @@ class PostTest extends TestCase
         }
     }
 
+    public function test_photos_are_stored_as_webp(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('admin.posts.store'), [
+            'title' => 'WebP Conversion Test',
+            'content' => 'Testing that uploaded photos are converted to WebP format.',
+            'photos' => [
+                UploadedFile::fake()->image('photo.jpg', 1920, 1080),
+                UploadedFile::fake()->image('photo.png', 800, 600),
+            ],
+            'cover_index' => 0,
+            'location_name' => 'Tokyo, Japan',
+            'latitude' => '35.6762',
+            'longitude' => '139.6503',
+            'travel_date' => '2025-06-01',
+            'category' => PostCategory::City->value,
+            'status' => PostStatus::Draft->value,
+        ]);
+
+        $post = Post::where('title', 'WebP Conversion Test')->first();
+        $this->assertCount(2, $post->photos);
+
+        foreach ($post->photos as $photo) {
+            $this->assertStringEndsWith('.webp', $photo->path);
+            Storage::disk('public')->assertExists($photo->path);
+        }
+    }
+
+    public function test_new_photos_on_update_are_stored_as_webp(): void
+    {
+        Storage::fake('public');
+        $user = User::factory()->create();
+        $post = Post::factory()->for($user)->create();
+        $existingPhoto = PostPhoto::factory()->cover()->for($post)->create();
+
+        $this->actingAs($user)->put(route('admin.posts.update', $post), [
+            'title' => $post->title,
+            'content' => $post->content,
+            'photos' => [
+                UploadedFile::fake()->image('new-photo.jpg', 1200, 900),
+            ],
+            'existing_photos' => [$existingPhoto->id],
+            'cover_photo_id' => $existingPhoto->id,
+            'location_name' => $post->location_name,
+            'latitude' => $post->latitude,
+            'longitude' => $post->longitude,
+            'travel_date' => $post->travel_date->format('Y-m-d'),
+            'category' => $post->category->value,
+            'status' => $post->status->value,
+        ]);
+
+        $newPhoto = $post->fresh()->photos->where('id', '!=', $existingPhoto->id)->first();
+        $this->assertNotNull($newPhoto);
+        $this->assertStringEndsWith('.webp', $newPhoto->path);
+        Storage::disk('public')->assertExists($newPhoto->path);
+    }
+
     public function test_first_photo_is_cover_by_default(): void
     {
         Storage::fake('public');
