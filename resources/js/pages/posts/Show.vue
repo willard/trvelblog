@@ -3,6 +3,7 @@ import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Calendar, MapPin } from 'lucide-vue-next';
 import PostCategoryBadge from '@/components/admin/PostCategoryBadge.vue';
 import LeafletMap from '@/components/LeafletMap.vue';
+import PhotoGallery from '@/components/PhotoGallery.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -80,19 +81,7 @@ defineProps<{
                     <template v-if="post.photos && post.photos.length > 1">
                         <Separator class="my-6" />
                         <h3 class="mb-3 text-sm font-medium">Photos</h3>
-                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                            <div
-                                v-for="photo in post.photos"
-                                :key="photo.id"
-                                class="overflow-hidden rounded-lg"
-                            >
-                                <img
-                                    :src="`/storage/${photo.path}`"
-                                    alt="Post photo"
-                                    class="aspect-square w-full object-cover"
-                                />
-                            </div>
-                        </div>
+                        <PhotoGallery :photos="post.photos" />
                     </template>
 
                     <Separator class="my-6" />
