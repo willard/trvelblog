@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Post;
+use App\Models\PostPhoto;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -41,5 +42,42 @@ class PostShowTest extends TestCase
         $response = $this->get('/posts/nonexistent-slug');
 
         $response->assertNotFound();
+    }
+
+    public function test_post_show_includes_photos_with_correct_shape(): void
+    {
+        $user = User::factory()->create();
+        $post = Post::factory()->for($user)->published()->create();
+        PostPhoto::factory()->cover()->for($post)->create();
+        PostPhoto::factory()->for($post)->count(2)->create();
+
+        $response = $this->get(route('posts.show', $post));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('posts/Show')
+            ->has('post.photos', 3)
+            ->has('post.photos.0', fn ($photo) => $photo
+                ->has('id')
+                ->has('path')
+                ->has('is_cover')
+                ->has('order')
+                ->etc()
+            )
+        );
+    }
+
+    public function test_post_show_with_no_photos_returns_empty_photos_array(): void
+    {
+        $user = User::factory()->create();
+        $post = Post::factory()->for($user)->published()->create();
+
+        $response = $this->get(route('posts.show', $post));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('posts/Show')
+            ->has('post.photos', 0)
+        );
     }
 }

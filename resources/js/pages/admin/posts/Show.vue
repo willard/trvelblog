@@ -10,6 +10,7 @@ import {
 } from 'lucide-vue-next';
 import PostCategoryBadge from '@/components/admin/PostCategoryBadge.vue';
 import PostStatusBadge from '@/components/admin/PostStatusBadge.vue';
+import PhotoGallery from '@/components/PhotoGallery.vue';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -187,19 +188,7 @@ function deletePost() {
                     <template v-if="post.photos && post.photos.length > 1">
                         <Separator class="my-6" />
                         <h3 class="mb-3 text-sm font-medium">All Photos</h3>
-                        <div class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                            <div
-                                v-for="photo in post.photos"
-                                :key="photo.id"
-                                class="overflow-hidden rounded-lg"
-                            >
-                                <img
-                                    :src="`/storage/${photo.path}`"
-                                    alt="Post photo"
-                                    class="aspect-square w-full object-cover"
-                                />
-                            </div>
-                        </div>
+                        <PhotoGallery :photos="post.photos" />
                     </template>
 
                     <Separator class="my-6" />
