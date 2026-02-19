@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
-import { Head, router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import { Map, MapPin, Newspaper, Search } from 'lucide-vue-next';
 import LeafletMap from '@/components/LeafletMap.vue';
 import PostCard from '@/components/PostCard.vue';
+import SeoHead from '@/components/SeoHead.vue';
 import { Input } from '@/components/ui/input';
 import BlogLayout from '@/layouts/BlogLayout.vue';
 import { home } from '@/routes';
 import { show as postsShow } from '@/routes/posts';
-import { categoryLabels, type Post, type PostCategory } from '@/types';
+import { categoryLabels, type Post, type PostCategory, type Seo } from '@/types';
 
 const props = defineProps<{
     posts: Post[];
@@ -16,6 +17,7 @@ const props = defineProps<{
         category: PostCategory | null;
         search: string | null;
     };
+    seo: Seo;
 }>();
 
 const categories: Array<{ value: PostCategory | null; label: string }> = [
@@ -68,7 +70,7 @@ watch(searchInput, (value) => {
 </script>
 
 <template>
-    <Head title="Home" />
+    <SeoHead :seo="seo" />
 
     <BlogLayout>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

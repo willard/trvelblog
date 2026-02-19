@@ -50,6 +50,12 @@ class HomeController extends Controller
                 'category' => $category,
                 'search' => $search,
             ],
+            'seo' => [
+                'title' => config('app.name').' — Travel Blog',
+                'description' => 'Explore travel stories, destinations, and adventures from around the world.',
+                'canonical' => route('home'),
+                'og_image' => null,
+            ],
         ]);
     }
 }

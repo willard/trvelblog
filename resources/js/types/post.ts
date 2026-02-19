@@ -37,6 +37,13 @@ export type Post = {
     updated_at: string;
 };
 
+export type Seo = {
+    title: string;
+    description: string;
+    canonical: string;
+    og_image: string | null;
+};
+
 export type PostStats = {
     totalPosts: number;
     publishedCount: number;

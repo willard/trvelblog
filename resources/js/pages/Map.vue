@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3';
 import LeafletMap from '@/components/LeafletMap.vue';
+import SeoHead from '@/components/SeoHead.vue';
 import BlogLayout from '@/layouts/BlogLayout.vue';
 import { show as postsShow } from '@/routes/posts';
-import type { Post } from '@/types';
+import type { Post, Seo } from '@/types';
 
 defineProps<{
     posts: Post[];
+    seo: Seo;
 }>();
 
 function handleMarkerClick(slug: string): void {
@@ -15,7 +17,7 @@ function handleMarkerClick(slug: string): void {
 </script>
 
 <template>
-    <Head title="Map" />
+    <SeoHead :seo="seo" />
 
     <BlogLayout>
         <div class="h-[calc(100svh-3.5rem)]">
