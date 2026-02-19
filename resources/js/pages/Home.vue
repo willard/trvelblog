@@ -1,19 +1,70 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue';
 import { Head, router } from '@inertiajs/vue3';
-import { Map, MapPin, Newspaper } from 'lucide-vue-next';
+import { Map, MapPin, Newspaper, Search } from 'lucide-vue-next';
 import LeafletMap from '@/components/LeafletMap.vue';
 import PostCard from '@/components/PostCard.vue';
+import { Input } from '@/components/ui/input';
 import BlogLayout from '@/layouts/BlogLayout.vue';
+import { home } from '@/routes';
 import { show as postsShow } from '@/routes/posts';
-import type { Post } from '@/types';
+import { categoryLabels, type Post, type PostCategory } from '@/types';
 
-defineProps<{
+const props = defineProps<{
     posts: Post[];
+    filters: {
+        category: PostCategory | null;
+        search: string | null;
+    };
 }>();
 
-function handleMarkerClick(slug: string) {
+const categories: Array<{ value: PostCategory | null; label: string }> = [
+    { value: null, label: 'All' },
+    { value: 'adventure', label: categoryLabels.adventure },
+    { value: 'beach', label: categoryLabels.beach },
+    { value: 'city', label: categoryLabels.city },
+    { value: 'cultural', label: categoryLabels.cultural },
+    { value: 'food', label: categoryLabels.food },
+    { value: 'mountain', label: categoryLabels.mountain },
+    { value: 'nature', label: categoryLabels.nature },
+    { value: 'road_trip', label: categoryLabels.road_trip },
+];
+
+const searchInput = ref<string>(props.filters.search ?? '');
+let searchTimer: ReturnType<typeof setTimeout> | null = null;
+
+function selectCategory(category: PostCategory | null): void {
+    router.visit(home().url, {
+        data: {
+            category: category ?? undefined,
+            search: searchInput.value || undefined,
+        },
+        preserveState: true,
+        preserveScroll: true,
+        replace: true,
+    });
+}
+
+function handleMarkerClick(slug: string): void {
     router.visit(postsShow(slug).url);
 }
+
+watch(searchInput, (value) => {
+    if (searchTimer) {
+        clearTimeout(searchTimer);
+    }
+    searchTimer = setTimeout(() => {
+        router.visit(home().url, {
+            data: {
+                category: props.filters.category ?? undefined,
+                search: value || undefined,
+            },
+            preserveState: true,
+            preserveScroll: true,
+            replace: true,
+        });
+    }, 300);
+});
 </script>
 
 <template>
@@ -60,6 +111,38 @@ function handleMarkerClick(slug: string) {
                 </div>
             </section>
 
+            <!-- Filter Bar -->
+            <section class="pb-6">
+                <div class="relative mb-4">
+                    <Search
+                        class="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                    />
+                    <Input
+                        v-model="searchInput"
+                        type="search"
+                        placeholder="Search destinations, stories..."
+                        class="pl-9"
+                    />
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button
+                        v-for="cat in categories"
+                        :key="cat.value ?? 'all'"
+                        type="button"
+                        :class="[
+                            'rounded-full border px-3 py-1 text-sm font-medium transition-colors',
+                            filters.category === cat.value
+                                ? 'border-primary bg-primary text-primary-foreground'
+                                : 'border-border bg-background text-muted-foreground hover:border-foreground hover:text-foreground',
+                        ]"
+                        @click="selectCategory(cat.value)"
+                    >
+                        {{ cat.label }}
+                    </button>
+                </div>
+            </section>
+
             <!-- Feed Section -->
             <section class="pb-20">
                 <div class="mb-6 flex items-center gap-2">
@@ -84,9 +167,9 @@ function handleMarkerClick(slug: string) {
                     class="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border py-16 text-center"
                 >
                     <MapPin class="size-10 text-muted-foreground/40" />
-                    <h3 class="text-lg font-medium">No stories yet</h3>
+                    <h3 class="text-lg font-medium">No stories found</h3>
                     <p class="text-sm text-muted-foreground">
-                        Travel stories will appear here once published.
+                        Try adjusting your search or category filter.
                     </p>
                 </div>
             </section>
