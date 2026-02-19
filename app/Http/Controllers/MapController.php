@@ -25,6 +25,12 @@ class MapController extends Controller
 
         return Inertia::render('Map', [
             'posts' => $posts,
+            'seo' => [
+                'title' => 'Map — '.config('app.name'),
+                'description' => 'Interactive map of all travel destinations.',
+                'canonical' => route('map'),
+                'og_image' => null,
+            ],
         ]);
     }
 }

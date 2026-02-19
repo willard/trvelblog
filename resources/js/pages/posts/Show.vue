@@ -1,23 +1,41 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Calendar, MapPin } from 'lucide-vue-next';
+import { computed } from 'vue';
 import PostCategoryBadge from '@/components/admin/PostCategoryBadge.vue';
 import LeafletMap from '@/components/LeafletMap.vue';
 import PhotoGallery from '@/components/PhotoGallery.vue';
+import SeoHead from '@/components/SeoHead.vue';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import BlogLayout from '@/layouts/BlogLayout.vue';
 import { home } from '@/routes';
-import type { Post } from '@/types';
+import type { Post, Seo } from '@/types';
 
-defineProps<{
+const props = defineProps<{
     post: Post;
+    seo: Seo;
 }>();
+
+const jsonLd = computed(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: props.post.title,
+    description: props.seo.description,
+    datePublished: props.post.published_at,
+    dateModified: props.post.updated_at,
+    ...(props.seo.og_image ? { image: props.seo.og_image } : {}),
+    url: props.seo.canonical,
+    author: { '@type': 'Person', name: 'Travel Blog' },
+}));
 </script>
 
 <template>
-    <Head :title="post.title" />
+    <SeoHead :seo="seo" />
+    <Head>
+        <component :is="'script'" type="application/ld+json">{{ JSON.stringify(jsonLd) }}</component>
+    </Head>
 
     <BlogLayout>
         <div class="mx-auto max-w-3xl px-4 py-8 sm:px-6 lg:px-8">
