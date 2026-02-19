@@ -2,20 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PostCategory;
 use App\Models\Post;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class HomeController extends Controller
 {
-    /**
-     * Display the home page with published travel posts.
-     */
-    public function __invoke(): Response
+    public function __invoke(Request $request): Response
     {
+        $category = $request->string('category')->toString() ?: null;
+        $search = $request->string('search')->toString() ?: null;
+
         $posts = Post::query()
             ->published()
             ->with('coverPhoto')
+            ->when(
+                $category !== null && PostCategory::tryFrom($category) !== null,
+                fn ($query) => $query->where('category', $category),
+            )
+            ->when(
+                $search !== null,
+                fn ($query) => $query->where(fn ($q) => $q
+                    ->where('title', 'like', "%{$search}%")
+                    ->orWhere('location_name', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%")
+                ),
+            )
             ->latest('published_at')
             ->get([
                 'id',
@@ -32,6 +46,10 @@ class HomeController extends Controller
 
         return Inertia::render('Home', [
             'posts' => $posts,
+            'filters' => [
+                'category' => $category,
+                'search' => $search,
+            ],
         ]);
     }
 }
