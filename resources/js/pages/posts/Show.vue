@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeft, Calendar, MapPin } from 'lucide-vue-next';
+import { computed } from 'vue';
 import PostCategoryBadge from '@/components/admin/PostCategoryBadge.vue';
 import LeafletMap from '@/components/LeafletMap.vue';
 import PhotoGallery from '@/components/PhotoGallery.vue';
@@ -34,7 +34,7 @@ const jsonLd = computed(() => ({
 <template>
     <SeoHead :seo="seo" />
     <Head>
-        <component is="script" type="application/ld+json">{{ JSON.stringify(jsonLd) }}</component>
+        <component :is="'script'" type="application/ld+json">{{ JSON.stringify(jsonLd) }}</component>
     </Head>
 
     <BlogLayout>
