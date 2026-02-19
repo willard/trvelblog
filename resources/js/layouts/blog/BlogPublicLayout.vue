@@ -30,6 +30,13 @@ const user = page.props.auth?.user;
                 </Link>
 
                 <nav class="flex items-center gap-1">
+                    <Link
+                        href="/map"
+                        class="rounded-md px-3 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    >
+                        Map
+                    </Link>
+
                     <slot name="nav" />
 
                     <template v-if="user">
