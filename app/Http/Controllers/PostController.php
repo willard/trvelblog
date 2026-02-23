@@ -41,8 +41,16 @@ class PostController extends Controller
                 'published_at',
             ]);
 
+        $comments = $post->comments()
+            ->approved()
+            ->topLevel()
+            ->with(['replies' => fn ($q) => $q->approved()->oldest()])
+            ->latest()
+            ->get();
+
         return Inertia::render('posts/Show', [
             'post' => $post,
+            'comments' => $comments,
             'relatedPosts' => $relatedPosts,
             'seo' => [
                 'title' => $post->title.' — '.config('app.name'),

@@ -6,6 +6,7 @@ import {
     LayoutDashboard,
     MapPin,
     Menu,
+    MessageSquare,
 } from 'lucide-vue-next';
 import { computed } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -35,6 +36,7 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
 import { dashboard } from '@/routes';
 import { dashboard as adminDashboard } from '@/routes/admin';
+import { index as commentsIndex } from '@/routes/admin/comments';
 import { index as postsIndex } from '@/routes/admin/posts';
 import type { BreadcrumbItem, NavItem } from '@/types';
 
@@ -63,6 +65,11 @@ const mainNavItems: NavItem[] = [
         title: 'Posts',
         href: postsIndex(),
         icon: FileText,
+    },
+    {
+        title: 'Comments',
+        href: commentsIndex(),
+        icon: MessageSquare,
     },
 ];
 </script>

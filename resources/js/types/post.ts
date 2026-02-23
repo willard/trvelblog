@@ -39,6 +39,16 @@ export type Post = {
     updated_at: string;
 };
 
+export type Comment = {
+    id: number;
+    post_id: number;
+    parent_id: number | null;
+    guest_name: string;
+    content: string;
+    created_at: string;
+    replies?: Comment[];
+};
+
 export type Seo = {
     title: string;
     description: string;

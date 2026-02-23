@@ -79,6 +79,11 @@ class Post extends Model
         return $this->hasOne(PostPhoto::class)->where('is_cover', true);
     }
 
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
     /**
      * Get the route key for the model.
      */
