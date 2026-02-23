@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Head, Link, useForm, usePage } from '@inertiajs/vue3';
-import { ArrowLeft, Calendar, Check, Clock, Copy, MapPin, MessageSquare, Reply, Share2, User } from 'lucide-vue-next';
+import { ArrowLeft, Calendar, Check, Clock, Copy, MapPin, MessageSquare, Reply, Share2 } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
 import { store as storeComment } from '@/actions/App/Http/Controllers/CommentController';
 import PostCategoryBadge from '@/components/admin/PostCategoryBadge.vue';
 import LeafletMap from '@/components/LeafletMap.vue';
-import PostCard from '@/components/PostCard.vue';
 import PhotoGallery from '@/components/PhotoGallery.vue';
+import PostCard from '@/components/PostCard.vue';
 import SeoHead from '@/components/SeoHead.vue';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
