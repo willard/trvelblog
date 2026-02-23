@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { Calendar, MapPin } from 'lucide-vue-next';
+import { Calendar, Clock, MapPin } from 'lucide-vue-next';
+import { computed } from 'vue';
 import PostCategoryBadge from '@/components/admin/PostCategoryBadge.vue';
 import { Card } from '@/components/ui/card';
 import { show as postsShow } from '@/routes/posts';
 import type { Post } from '@/types';
 
-defineProps<{
+const props = defineProps<{
     post: Post;
 }>();
+
+const readingTime = computed(() => Math.ceil(props.post.content.trim().split(/\s+/).length / 200));
 </script>
 
 <template>
@@ -39,6 +42,16 @@ defineProps<{
                     {{ post.content.substring(0, 150) }}
                 </p>
 
+                <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-1">
+                    <span
+                        v-for="tag in post.tags.slice(0, 3)"
+                        :key="tag"
+                        class="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                    >
+                        {{ tag }}
+                    </span>
+                </div>
+
                 <div
                     class="mt-auto flex items-center gap-3 pt-2 text-xs text-muted-foreground"
                 >
@@ -62,6 +75,10 @@ defineProps<{
                                 )
                             }}
                         </span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <Clock class="size-3.5" />
+                        <span>{{ readingTime }} min read</span>
                     </div>
                 </div>
             </div>

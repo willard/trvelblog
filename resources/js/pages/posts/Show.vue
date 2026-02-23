@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { ArrowLeft, Calendar, MapPin } from 'lucide-vue-next';
-import { computed } from 'vue';
+import { ArrowLeft, Calendar, Check, Clock, Copy, MapPin, Share2 } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
 import PostCategoryBadge from '@/components/admin/PostCategoryBadge.vue';
 import LeafletMap from '@/components/LeafletMap.vue';
+import PostCard from '@/components/PostCard.vue';
 import PhotoGallery from '@/components/PhotoGallery.vue';
 import SeoHead from '@/components/SeoHead.vue';
 import { Button } from '@/components/ui/button';
@@ -11,12 +12,32 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import BlogLayout from '@/layouts/BlogLayout.vue';
 import { home } from '@/routes';
-import type { Post, Seo } from '@/types';
+import { categoryLabels, type Post, type Seo } from '@/types';
 
 const props = defineProps<{
     post: Post;
+    relatedPosts: Post[];
     seo: Seo;
 }>();
+
+const readingTime = computed(() => Math.ceil(props.post.content.trim().split(/\s+/).length / 200));
+
+const copied = ref(false);
+
+function shareOnX(): void {
+    const text = encodeURIComponent(props.post.title);
+    const url = encodeURIComponent(props.seo.canonical);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+}
+
+function copyLink(): void {
+    navigator.clipboard.writeText(props.seo.canonical).then(() => {
+        copied.value = true;
+        setTimeout(() => {
+            copied.value = false;
+        }, 2000);
+    });
+}
 
 const jsonLd = computed(() => ({
     '@context': 'https://schema.org',
@@ -85,6 +106,20 @@ const jsonLd = computed(() => ({
                                 }}
                             </span>
                         </div>
+                        <div class="flex items-center gap-1.5">
+                            <Clock class="size-4" />
+                            <span>{{ readingTime }} min read</span>
+                        </div>
+                    </div>
+
+                    <div v-if="post.tags && post.tags.length > 0" class="mb-6 flex flex-wrap gap-1.5">
+                        <span
+                            v-for="tag in post.tags"
+                            :key="tag"
+                            class="rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground"
+                        >
+                            {{ tag }}
+                        </span>
                     </div>
 
                     <Separator class="mb-6" />
@@ -107,6 +142,35 @@ const jsonLd = computed(() => ({
                     <div class="overflow-hidden rounded-lg">
                         <LeafletMap :posts="[post]" height="250px" :zoom="5" />
                     </div>
+
+                    <Separator class="my-6" />
+
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm font-medium text-muted-foreground">Share</span>
+                        <Button variant="outline" size="sm" @click="shareOnX">
+                            <Share2 class="mr-2 size-4" />
+                            Twitter / X
+                        </Button>
+                        <Button variant="outline" size="sm" @click="copyLink">
+                            <Check v-if="copied" class="mr-2 size-4 text-green-500" />
+                            <Copy v-else class="mr-2 size-4" />
+                            {{ copied ? 'Copied!' : 'Copy Link' }}
+                        </Button>
+                    </div>
+
+                    <template v-if="relatedPosts.length > 0">
+                        <Separator class="my-6" />
+                        <h3 class="mb-4 text-lg font-semibold">
+                            More {{ categoryLabels[post.category] }} Stories
+                        </h3>
+                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            <PostCard
+                                v-for="related in relatedPosts"
+                                :key="related.id"
+                                :post="related"
+                            />
+                        </div>
+                    </template>
                 </CardContent>
             </Card>
         </div>

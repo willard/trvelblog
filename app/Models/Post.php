@@ -31,8 +31,10 @@ class Post extends Model
         'longitude',
         'travel_date',
         'category',
+        'tags',
         'status',
         'published_at',
+        'is_featured',
     ];
 
     /**
@@ -49,6 +51,8 @@ class Post extends Model
             'published_at' => 'datetime',
             'latitude' => 'decimal:7',
             'longitude' => 'decimal:7',
+            'tags' => 'array',
+            'is_featured' => 'boolean',
         ];
     }
 

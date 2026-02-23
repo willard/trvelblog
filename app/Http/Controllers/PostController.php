@@ -19,8 +19,31 @@ class PostController extends Controller
 
         $post->load('photos')->loadMissing('coverPhoto');
 
+        $relatedPosts = Post::query()
+            ->published()
+            ->where('category', $post->category)
+            ->where('id', '!=', $post->id)
+            ->with('coverPhoto')
+            ->latest('published_at')
+            ->limit(3)
+            ->get([
+                'id',
+                'title',
+                'slug',
+                'content',
+                'location_name',
+                'latitude',
+                'longitude',
+                'travel_date',
+                'category',
+                'tags',
+                'is_featured',
+                'published_at',
+            ]);
+
         return Inertia::render('posts/Show', [
             'post' => $post,
+            'relatedPosts' => $relatedPosts,
             'seo' => [
                 'title' => $post->title.' — '.config('app.name'),
                 'description' => Str::limit(strip_tags($post->content), 160),

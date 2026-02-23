@@ -32,6 +32,9 @@ class UpdatePostRequest extends FormRequest
             'longitude' => ['required', 'numeric', 'between:-180,180'],
             'travel_date' => ['required', 'date', 'before_or_equal:today'],
             'category' => ['required', new Enum(PostCategory::class)],
+            'tags' => ['nullable', 'array'],
+            'tags.*' => ['string', 'max:50'],
+            'is_featured' => ['boolean'],
             'status' => ['required', new Enum(PostStatus::class)],
         ];
     }

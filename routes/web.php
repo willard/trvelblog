@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\RssFeedController;
 use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,6 +15,8 @@ Route::get('/map', MapController::class)->name('map');
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
+
+Route::get('/feed.xml', RssFeedController::class)->name('feed');
 
 Route::get('/robots.txt', function () {
     $content = implode("\n", [

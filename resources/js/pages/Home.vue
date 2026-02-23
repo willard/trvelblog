@@ -1,18 +1,19 @@
 <script setup lang="ts">
+import { InfiniteScroll, router } from '@inertiajs/vue3';
+import { Map, MapPin, Newspaper, Search, Star } from 'lucide-vue-next';
 import { ref, watch } from 'vue';
-import { router } from '@inertiajs/vue3';
-import { Map, MapPin, Newspaper, Search } from 'lucide-vue-next';
 import LeafletMap from '@/components/LeafletMap.vue';
 import PostCard from '@/components/PostCard.vue';
 import SeoHead from '@/components/SeoHead.vue';
-import { Input } from '@/components/ui/input';
+import { Skeleton } from '@/components/ui/skeleton';
 import BlogLayout from '@/layouts/BlogLayout.vue';
 import { home } from '@/routes';
 import { show as postsShow } from '@/routes/posts';
-import { categoryLabels, type Post, type PostCategory, type Seo } from '@/types';
+import { categoryLabels, type PaginatedPosts, type Post, type PostCategory, type Seo } from '@/types';
 
 const props = defineProps<{
-    posts: Post[];
+    featuredPosts: Post[];
+    posts: PaginatedPosts;
     filters: {
         category: PostCategory | null;
         search: string | null;
@@ -44,6 +45,7 @@ function selectCategory(category: PostCategory | null): void {
         preserveState: true,
         preserveScroll: true,
         replace: true,
+        reset: ['posts'],
     });
 }
 
@@ -64,6 +66,7 @@ watch(searchInput, (value) => {
             preserveState: true,
             preserveScroll: true,
             replace: true,
+            reset: ['posts'],
         });
     }, 300);
 });
@@ -99,17 +102,34 @@ watch(searchInput, (value) => {
             </section>
 
             <!-- Map Section -->
-            <section v-if="posts.length > 0" class="pb-12">
+            <section v-if="posts.data.length > 0" class="pb-12">
                 <div class="mb-4 flex items-center gap-2">
                     <Map class="size-5 text-muted-foreground" />
                     <h2 class="text-xl font-semibold">Destinations</h2>
                 </div>
                 <div class="overflow-hidden rounded-xl border border-border">
                     <LeafletMap
-                        :posts="posts"
+                        :posts="posts.data"
                         height="400px"
                         @marker-click="handleMarkerClick"
                     />
+                </div>
+            </section>
+
+            <!-- Featured Posts -->
+            <section v-if="featuredPosts.length > 0" class="pb-10">
+                <div class="mb-4 flex items-center gap-2">
+                    <Star class="size-5 text-yellow-500" />
+                    <h2 class="text-xl font-semibold">Featured</h2>
+                </div>
+                <div class="flex gap-4 overflow-x-auto pb-2 snap-x">
+                    <div
+                        v-for="post in featuredPosts"
+                        :key="post.id"
+                        class="w-72 shrink-0 snap-start"
+                    >
+                        <PostCard :post="post" />
+                    </div>
                 </div>
             </section>
 
@@ -152,28 +172,48 @@ watch(searchInput, (value) => {
                     <h2 class="text-xl font-semibold">Latest Stories</h2>
                 </div>
 
-                <div
-                    v-if="posts.length > 0"
-                    class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-                >
-                    <PostCard
-                        v-for="post in posts"
-                        :key="post.id"
-                        :post="post"
-                    />
-                </div>
+                <InfiniteScroll data="posts">
+                    <template #loading>
+                        <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            <div
+                                v-for="i in 3"
+                                :key="i"
+                                class="overflow-hidden rounded-xl border border-border"
+                            >
+                                <Skeleton class="aspect-video w-full" />
+                                <div class="flex flex-col gap-2 p-4">
+                                    <Skeleton class="h-4 w-20 rounded-full" />
+                                    <Skeleton class="h-5 w-3/4" />
+                                    <Skeleton class="h-4 w-full" />
+                                    <Skeleton class="h-4 w-2/3" />
+                                </div>
+                            </div>
+                        </div>
+                    </template>
 
-                <!-- Empty state -->
-                <div
-                    v-else
-                    class="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border py-16 text-center"
-                >
-                    <MapPin class="size-10 text-muted-foreground/40" />
-                    <h3 class="text-lg font-medium">No stories found</h3>
-                    <p class="text-sm text-muted-foreground">
-                        Try adjusting your search or category filter.
-                    </p>
-                </div>
+                    <div
+                        v-if="posts.data.length > 0"
+                        class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+                    >
+                        <PostCard
+                            v-for="post in posts.data"
+                            :key="post.id"
+                            :post="post"
+                        />
+                    </div>
+
+                    <!-- Empty state -->
+                    <div
+                        v-else
+                        class="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border py-16 text-center"
+                    >
+                        <MapPin class="size-10 text-muted-foreground/40" />
+                        <h3 class="text-lg font-medium">No stories found</h3>
+                        <p class="text-sm text-muted-foreground">
+                            Try adjusting your search or category filter.
+                        </p>
+                    </div>
+                </InfiniteScroll>
             </section>
         </div>
     </BlogLayout>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { ChevronLeft, ChevronRight, X } from 'lucide-vue-next';
 import { DialogClose, DialogContent, DialogDescription, DialogPortal, DialogTitle, VisuallyHidden } from 'reka-ui';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { Dialog, DialogOverlay } from '@/components/ui/dialog';
 import type { PostPhoto } from '@/types';
 

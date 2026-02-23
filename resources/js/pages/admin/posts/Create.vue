@@ -12,6 +12,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -68,8 +69,27 @@ const form = useForm({
     longitude: '',
     travel_date: '',
     category: '',
+    tags: [] as string[],
+    is_featured: false,
     status: 'draft',
 });
+
+const tagInput = ref('');
+
+function onTagKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' || event.key === ',') {
+        event.preventDefault();
+        const value = tagInput.value.trim().replace(/,$/, '');
+        if (value && !form.tags.includes(value)) {
+            form.tags.push(value);
+        }
+        tagInput.value = '';
+    }
+}
+
+function removeTag(index: number): void {
+    form.tags.splice(index, 1);
+}
 
 const photoPreviews = ref<string[]>([]);
 
@@ -336,6 +356,44 @@ function submit() {
                                 </Select>
                                 <InputError :message="form.errors.status" />
                             </div>
+                        </div>
+
+                        <div class="grid gap-2">
+                            <Label for="tag-input">Tags</Label>
+                            <div v-if="form.tags.length > 0" class="flex flex-wrap gap-1.5">
+                                <span
+                                    v-for="(tag, index) in form.tags"
+                                    :key="index"
+                                    class="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium"
+                                >
+                                    {{ tag }}
+                                    <button
+                                        type="button"
+                                        class="text-muted-foreground hover:text-foreground"
+                                        @click="removeTag(index)"
+                                    >
+                                        <X class="size-3" />
+                                    </button>
+                                </span>
+                            </div>
+                            <Input
+                                id="tag-input"
+                                v-model="tagInput"
+                                placeholder="Add a tag and press Enter or comma"
+                                @keydown="onTagKeydown"
+                            />
+                            <InputError :message="form.errors.tags" />
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                            <Checkbox
+                                id="is_featured"
+                                :checked="form.is_featured"
+                                @update:checked="(val) => (form.is_featured = Boolean(val))"
+                            />
+                            <Label for="is_featured" class="cursor-pointer font-normal">
+                                Feature this post on the homepage
+                            </Label>
                         </div>
                     </CardContent>
                 </Card>

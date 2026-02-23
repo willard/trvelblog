@@ -15,7 +15,30 @@ class HomeController extends Controller
         $category = $request->string('category')->toString() ?: null;
         $search = $request->string('search')->toString() ?: null;
 
-        $posts = Post::query()
+        $columns = [
+            'id',
+            'title',
+            'slug',
+            'content',
+            'location_name',
+            'latitude',
+            'longitude',
+            'travel_date',
+            'category',
+            'tags',
+            'is_featured',
+            'published_at',
+        ];
+
+        $featuredPosts = Post::query()
+            ->published()
+            ->where('is_featured', true)
+            ->with('coverPhoto')
+            ->latest('published_at')
+            ->limit(3)
+            ->get($columns);
+
+        $posts = Inertia::scroll(fn () => Post::query()
             ->published()
             ->with('coverPhoto')
             ->when(
@@ -31,20 +54,10 @@ class HomeController extends Controller
                 ),
             )
             ->latest('published_at')
-            ->get([
-                'id',
-                'title',
-                'slug',
-                'content',
-                'location_name',
-                'latitude',
-                'longitude',
-                'travel_date',
-                'category',
-                'published_at',
-            ]);
+            ->paginate(12, $columns));
 
         return Inertia::render('Home', [
+            'featuredPosts' => $featuredPosts,
             'posts' => $posts,
             'filters' => [
                 'category' => $category,

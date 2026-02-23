@@ -30,7 +30,7 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 3)
+            ->has('posts.data', 3)
         );
     }
 
@@ -44,7 +44,7 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 0)
+            ->has('posts.data', 0)
         );
     }
 
@@ -63,9 +63,9 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 2)
-            ->where('posts.0.id', $newer->id)
-            ->where('posts.1.id', $older->id)
+            ->has('posts.data', 2)
+            ->where('posts.data.0.id', $newer->id)
+            ->where('posts.data.1.id', $older->id)
         );
     }
 
@@ -92,7 +92,7 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 2)
+            ->has('posts.data', 2)
             ->where('filters.category', 'beach')
         );
     }
@@ -119,7 +119,7 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 3)
+            ->has('posts.data', 3)
         );
     }
 
@@ -134,8 +134,8 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 1)
-            ->where('posts.0.title', 'Paris Adventure')
+            ->has('posts.data', 1)
+            ->where('posts.data.0.title', 'Paris Adventure')
         );
     }
 
@@ -150,8 +150,8 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 1)
-            ->where('posts.0.location_name', 'Bali, Indonesia')
+            ->has('posts.data', 1)
+            ->where('posts.data.0.location_name', 'Bali, Indonesia')
         );
     }
 
@@ -170,7 +170,7 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 1)
+            ->has('posts.data', 1)
         );
     }
 
@@ -186,8 +186,50 @@ class HomeTest extends TestCase
         $response->assertOk();
         $response->assertInertia(fn ($page) => $page
             ->component('Home')
-            ->has('posts', 1)
-            ->where('posts.0.title', 'Bali Beach')
+            ->has('posts.data', 1)
+            ->where('posts.data.0.title', 'Bali Beach')
+        );
+    }
+
+    public function test_home_page_returns_paginated_posts(): void
+    {
+        $user = User::factory()->create();
+        Post::factory()->count(15)->for($user)->published()->create();
+
+        $response = $this->get(route('home'));
+
+        $response->assertOk();
+        $response->assertInertia(fn ($page) => $page
+            ->component('Home')
+            ->has('posts.data', 12)
+        );
+    }
+
+    public function test_home_page_passes_featured_posts_prop(): void
+    {
+        $user = User::factory()->create();
+        Post::factory()->for($user)->published()->create(['is_featured' => true]);
+        Post::factory()->for($user)->published()->create(['is_featured' => false]);
+
+        $response = $this->get(route('home'));
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('Home')
+            ->has('featuredPosts', 1)
+            ->has('posts.data', 2)
+        );
+    }
+
+    public function test_home_page_featured_posts_empty_when_none_featured(): void
+    {
+        $user = User::factory()->create();
+        Post::factory()->count(3)->for($user)->published()->create();
+
+        $response = $this->get(route('home'));
+
+        $response->assertInertia(fn ($page) => $page
+            ->component('Home')
+            ->has('featuredPosts', 0)
         );
     }
 }

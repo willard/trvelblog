@@ -31,6 +31,8 @@ export type Post = {
     longitude: number;
     travel_date: string;
     category: PostCategory;
+    tags: string[] | null;
+    is_featured: boolean;
     status: PostStatus;
     published_at: string | null;
     created_at: string;
@@ -42,6 +44,10 @@ export type Seo = {
     description: string;
     canonical: string;
     og_image: string | null;
+};
+
+export type PaginatedPosts = {
+    data: Post[];
 };
 
 export type PostStats = {
