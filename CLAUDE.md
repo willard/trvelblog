@@ -70,6 +70,10 @@ tests/
 - **Appearance:** Cookie-based (`appearance`) + localStorage; managed via `useAppearance` composable
 - **Middleware:** Configured in `bootstrap/app.php`; cookie encryption exceptions for `appearance` and `sidebar_state`
 
+## Git Workflow
+
+- **Never commit directly to `main`.** For every task: create a feature branch, commit there, push, and open a PR.
+
 ## Development Commands
 
 ```bash
