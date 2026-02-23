@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MapController;
 use App\Http\Controllers\PostController;
@@ -13,6 +14,10 @@ Route::get('/', HomeController::class)->name('home');
 Route::get('/map', MapController::class)->name('map');
 
 Route::get('/posts/{post}', [PostController::class, 'show'])->name('posts.show');
+
+Route::post('/comments', [CommentController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('comments.store');
 
 Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 
